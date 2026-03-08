@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Kinesin Redirector",
-  "version": "1.0",
+  "name": "Kinesin",
+  "version": "1.1",
   "description": "URL redirect rules with optional remote sync",
   "permissions": [
     "storage",
@@ -28,8 +28,11 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "redirector@ofhe.cn",
-      "strict_min_version": "109.0"
+      "id": "@kinesin-redirector",
+      "data_collection_permissions": {
+        "required": ["browsingActivity"]
+      },
+      "strict_min_version": "140.0"
     }
   }
 }
