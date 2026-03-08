@@ -1,0 +1,138 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  margin: 12px;
+  min-width: 400px; 
+  background: #f9f9f9;
+  color: #1e1e1e;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+h1 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+  color: #333;
+}
+
+.settings-icon {
+  text-decoration: none;
+  font-size: 20px;
+  color: #666;
+  transition: color 0.1s;
+}
+.settings-icon:hover {
+  color: #000;
+}
+
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.add-form input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+  background: white;
+}
+.add-form input:focus {
+  outline: none;
+  border-color: #888;
+}
+
+.add-form button {
+  padding: 8px 10px;
+  background: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.add-form button:hover {
+  background: #1e2b37;
+}
+
+.rule-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px 0;
+  max-height: 300px;
+  overflow-y: auto;
+  border-top: 1px solid #eee;
+}
+
+.rule-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+}
+
+.rule-list li input[type="checkbox"] {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.rule-list li span {
+  flex: 1;
+  word-break: break-word;
+  color: #333;
+}
+
+.rule-list li button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+  line-height: 1;
+}
+.rule-list li button.delete-btn {
+  color: #b00020;
+}
+.rule-list li button.delete-btn:hover {
+  color: #d32f2f;
+}
+.rule-list li button.edit-btn {
+  color: #2c3e50;
+}
+.rule-list li button.edit-btn:hover {
+  color: #1e2b37;
+}
+.rule-list li button.save-btn {
+  color: #2e7d32;
+}
+.rule-list li button.cancel-btn {
+  color: #b00020;
+}
+
+.rule-list li input[type="text"] {
+  border: 1px solid #ccc;
+  padding: 4px;
+  border-radius: 3px;
+  font-size: 12px;
+  flex: 1;
+  min-width: 70px; 
+}
+
+.sync-status {
+  font-size: 11px;
+  margin-top: 6px;
+  min-height: 16px;
+  color: #666;
+}

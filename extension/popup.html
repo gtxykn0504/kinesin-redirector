@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirector</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <h1>Redirector</h1>
+    <a href="/options.html" id="settingsLink" class="settings-icon" title="Settings">⚙️</a>
+  </div>
+
+  <form id="addForm" class="add-form">
+    <input id="pattern" type="text" placeholder="From, e.g. go.zh" required>
+    <input id="target" type="text" placeholder="To, e.g. cn.bing.com" required>
+    <button type="submit">➕ Add Rule</button>
+  </form>
+
+  <ul id="ruleList" class="rule-list"></ul>
+  <div id="syncStatus" class="sync-status"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
