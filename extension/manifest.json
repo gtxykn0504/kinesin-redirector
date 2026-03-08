@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Redirector",
+  "name": "Kinesin Redirector",
   "version": "1.0",
   "description": "URL redirect rules with remote sync",
   "permissions": [
