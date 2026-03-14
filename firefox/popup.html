@@ -1,25 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kinesin</title>
   <link rel="stylesheet" href="popup.css">
+  <script src="common.js"></script>
 </head>
 <body>
-  <script src="browser-polyfill.js"></script>
   <div class="header">
     <h1>Kinesin</h1>
-    <a href="/options.html" id="settingsLink" class="settings-icon" title="Settings">⚙️</a>
+    <a href="/options.html" id="settingsLink" class="settings-icon" title="Settings" aria-label="Open Settings">⚙️</a>
   </div>
 
-  <form id="addForm" class="add-form">
-    <input id="pattern" type="text" placeholder="From, e.g. go.zh" required>
-    <input id="target" type="text" placeholder="To, e.g. cn.bing.com" required>
-    <button type="submit">➕ Add Rule</button>
+  <form id="addForm" class="add-form" aria-label="Add new redirect rule">
+    <div class="form-group">
+      <label for="pattern">From URL Pattern</label>
+      <input id="pattern" type="text" placeholder="e.g. bing.go" required aria-describedby="patternHelp">
+      <span id="patternHelp" class="help-text">The URL pattern to match</span>
+    </div>
+    <div class="form-group">
+      <label for="target">To URL</label>
+      <input id="target" type="text" placeholder="e.g. www.bing.com" required aria-describedby="targetHelp">
+      <span id="targetHelp" class="help-text">The target URL to redirect to</span>
+    </div>
+    <div class="form-group">
+      <label for="groupSelect">Group</label>
+      <select id="groupSelect" aria-describedby="groupSelectHelp">
+        <option value="">Auto Group</option>
+      </select>
+      <span id="groupSelectHelp" class="help-text">Select a group to manage the rule</span>
+    </div>
+    <button type="submit" class="add-btn">Add Rule</button>
   </form>
 
-  <ul id="ruleList" class="rule-list"></ul>
-  <div id="syncStatus" class="sync-status"></div>
+  <div id="syncStatus" class="sync-status" role="status" aria-live="polite"></div>
 
   <script src="popup.js"></script>
 </body>
