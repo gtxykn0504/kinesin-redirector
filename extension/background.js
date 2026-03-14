@@ -1,89 +1,136 @@
-const STORAGE_KEY = 'rules';
-const CONFIG_KEY = 'syncConfig';
+importScripts('common.js');
+
+const RESOURCE_TYPES = ['main_frame'];
+const DEFAULT_PRIORITY = 1;
 
 async function loadRules() {
-  const { [STORAGE_KEY]: rules = [] } = await chrome.storage.sync.get(STORAGE_KEY);
-  return rules;
+  try {
+    const { [STORAGE_KEY]: rules = [] } = await chrome.storage.sync.get(STORAGE_KEY);
+    return rules;
+  } catch (error) {
+    console.error('Failed to load rules:', error);
+    return [];
+  }
 }
 
 function escapeRegex(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return str.replace(/[.*+?^${}()|[\\]/g, '\\$&');
+}
+
+function normalizeFromPattern(from) {
+  const trimmed = from.trim();
+  if (!trimmed.includes('://') && !trimmed.includes('*')) {
+    return `*://${trimmed}/*`;
+  }
+  return trimmed;
+}
+
+function normalizeToPattern(to, hasWildcard) {
+  let normalized = to.trim();
+  
+  if (!normalized.match(/^\w+:\/\//)) {
+    normalized = 'https://' + normalized;
+  }
+  
+  if (hasWildcard && !normalized.includes('$')) {
+    if (!normalized.includes('/')) {
+      return normalized + '/$1';
+    }
+    console.warn('Rule target should include $1 to capture path:', to);
+  }
+  
+  return normalized;
 }
 
 function buildDNRule(rule, idx) {
-  let from = rule.from.trim();
-  let to = rule.to.trim();
+  const from = normalizeFromPattern(rule.from);
+  const to = normalizeToPattern(rule.to, from.includes('*'));
 
-  if (!from.includes('://') && !from.includes('*')) {
-    from = `*://${from}/*`;
-  }
   const parts = from.split('*').map(part => escapeRegex(part));
   const regexString = '^' + parts.join('(.*)') + '$';
-  const starCount = (from.match(/\*/g) || []).length;
-
-  if (!to.match(/^\w+:\/\//)) {
-    to = 'https://' + to;
-  }
-  if (starCount > 0 && !to.includes('$')) {
-    if (!to.includes('/')) {
-      to = to + '/$1';
-    } else {
-      console.warn('Rule target should include $1 to capture path', rule);
-    }
-  }
 
   return {
     id: idx + 1,
-    priority: 1,
-    action: { type: 'redirect', redirect: { regexSubstitution: to } },
-    condition: { regexFilter: regexString, resourceTypes: ['main_frame'] }
+    priority: DEFAULT_PRIORITY,
+    action: {
+      type: 'redirect',
+      redirect: { regexSubstitution: to }
+    },
+    condition: {
+      regexFilter: regexString,
+      resourceTypes: RESOURCE_TYPES
+    }
   };
 }
 
 async function syncDynamicRules() {
-  const rules = await loadRules();
-  const dnrRules = rules.filter(r => r.enabled).map(buildDNRule);
-  const existing = await chrome.declarativeNetRequest.getDynamicRules();
-  const removeIds = existing.map(r => r.id);
-  await chrome.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: removeIds,
-    addRules: dnrRules
-  });
-}
-
-// 从服务器下载规则
-async function downloadRulesFromServer() {
-  const config = (await chrome.storage.sync.get(CONFIG_KEY))[CONFIG_KEY];
-  // 仅当同步功能启用且配置完整时执行
-  if (!config || !config.enabled || !config.serverUrl || !config.apiKey) return;
-
   try {
-    const url = new URL(config.serverUrl);
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: { 'X-API-Key': config.apiKey }
+    const rules = await loadRules();
+    const enabledRules = rules.filter(r => r.enabled);
+    const dnrRules = enabledRules.map(buildDNRule);
+    
+    const existing = await chrome.declarativeNetRequest.getDynamicRules();
+    const removeIds = existing.map(r => r.id);
+    
+    await chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: removeIds,
+      addRules: dnrRules
     });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const remoteRules = await response.json();
-    if (!Array.isArray(remoteRules)) throw new Error('Invalid data');
-
-    await chrome.storage.sync.set({ [STORAGE_KEY]: remoteRules });
-    console.log('Auto-download on startup succeeded');
-  } catch (err) {
-    console.warn('Auto-download on startup failed:', err);
+    
+    console.log(`Synced ${dnrRules.length} dynamic rules`);
+  } catch (error) {
+    console.error('Failed to sync dynamic rules:', error);
   }
 }
 
-// 浏览器启动时自动下载（如果启用）
+async function downloadRulesAndUpdate() {
+  try {
+    if (typeof syncManager === 'undefined') {
+      console.warn('SyncManager not available');
+      return;
+    }
+
+    const config = (await chrome.storage.sync.get(CONFIG_KEY))[CONFIG_KEY];
+    
+    if (!config?.enabled || !config.serverUrl || !config.apiKey) {
+      console.log('Sync not configured, skipping download');
+      return;
+    }
+
+    const result = await syncManager.downloadFromServer();
+    
+    if (result) {
+      const { rules, groups } = result;
+      const validRules = syncManager.validateRules(rules);
+      const validGroups = syncManager.validateGroups(groups);
+      
+      await chrome.storage.sync.set({ 
+        [STORAGE_KEY]: validRules,
+        [GROUPS_KEY]: validGroups
+      });
+      
+      console.log(`Downloaded ${validRules.length} rules and ${validGroups.length} groups from server`);
+      await syncDynamicRules();
+    }
+  } catch (error) {
+    console.warn('Failed to download rules from server:', error.message);
+  }
+}
+
 chrome.runtime.onStartup.addListener(() => {
-  downloadRulesFromServer();
+  console.log('Extension started, downloading rules...');
+  downloadRulesAndUpdate();
 });
 
 chrome.runtime.onInstalled.addListener(() => {
+  console.log('Extension installed/updated, syncing rules...');
   syncDynamicRules();
-  downloadRulesFromServer(); // 安装时也尝试下载
+  downloadRulesAndUpdate();
 });
 
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'sync' && changes[STORAGE_KEY]) syncDynamicRules();
+  if (area === 'sync' && changes[STORAGE_KEY]) {
+    console.log('Rules changed, syncing dynamic rules...');
+    syncDynamicRules();
+  }
 });

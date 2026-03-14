@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Kinesin",
-  "version": "1.0",
+  "version": "1.2",
   "description": "URL redirect rules with remote sync",
   "permissions": [
     "storage",

@@ -1,136 +1,155 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kinesin Settings</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-      color: #1e1e1e;
-    }
-    .container {
-      max-width: 400px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      padding: 24px;
-    }
-    h2 {
-      font-size: 20px;
-      font-weight: 500;
-      margin: 0 0 8px 0;
-      color: #2c3e50;
-    }
-    .description {
-      font-size: 13px;
-      color: #666;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 12px;
-    }
-    label {
-      display: block;
-      margin-top: 16px;
-      font-weight: 500;
-      font-size: 13px;
-      color: #333;
-    }
-    input[type="url"], input[type="text"] {
-      width: 100%;
-      padding: 8px 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 13px;
-      box-sizing: border-box;
-      margin-top: 4px;
-    }
-    input[type="checkbox"] {
-      margin-right: 8px;
-      transform: scale(1.1);
-    }
-    .checkbox-label {
-      display: flex;
-      align-items: center;
-      margin-top: 18px;
-      font-weight: normal;
-    }
-    button {
-      padding: 8px 16px;
-      background: #2c3e50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 13px;
-      cursor: pointer;
-      font-weight: 500;
-      margin-top: 20px;
-    }
-    button:hover {
-      background: #1e2b37;
-    }
-    hr {
-      margin: 24px 0 16px;
-      border: none;
-      border-top: 1px solid #eee;
-    }
-    .status {
-      margin-top: 16px;
-      padding: 8px 10px;
-      border-radius: 4px;
-      font-size: 13px;
-      background: #f0f0f0;
-      color: #333;
-    }
-    .status:empty {
-      display: none;
-    }
-    .status.success { background: #e8f5e8; color: #2e7d32; }
-    .status.error { background: #ffebee; color: #b71c1c; }
-    .manual-download {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .manual-download button {
-      margin-top: 0;
-    }
-  </style>
+  <link rel="stylesheet" href="options.css">
+  <script src="common.js"></script>
 </head>
 <body>
   <div class="container">
-    <h2>Sync Settings</h2>
-    <div class="description">Configure remote server and API key (sent via <code>X-API-Key</code> header).</div>
-
-    <form id="configForm">
-      <label class="checkbox-label">
-        <input type="checkbox" id="enableSync"> Enable synchronization
-      </label>
-
-      <label>Server URL</label>
-      <input type="url" id="serverUrl" placeholder="https://api.exp.com/redirect.php" required>
-
-      <label>API Key</label>
-      <input type="text" id="apiKey" placeholder="your-secret-key" required>
-
-      <label class="checkbox-label">
-        <input type="checkbox" id="autoDownload"> Auto-download rules on browser start & popup open
-      </label>
-
-      <button type="submit">Save Settings</button>
-    </form>
-
-    <hr>
-
-    <div class="manual-download">
-      <span>Manual sync:</span>
-      <button id="downloadBtn">Download from Server</button>
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h1>Kinesin</h1>
+      </div>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <div class="nav-item active" data-page="rules" role="button" tabindex="0" aria-current="page">
+          <span class="nav-icon" aria-hidden="true">📋</span>
+          <span>Rules List</span>
+        </div>
+        <div class="nav-item" data-page="sync" role="button" tabindex="0">
+          <span class="nav-icon" aria-hidden="true">🔄</span>
+          <span>Sync Settings</span>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div id="syncStatus" class="sync-indicator" role="status" aria-live="polite">
+          <span class="sync-dot"></span>
+          <span class="sync-text">Ready</span>
+        </div>
+        <div class="version-info">
+          <span class="version">Version 1.2</span>
+          <a href="https://kegongteng.cn" target="_blank" class="powered-by">Powered by Kegongteng</a>
+        </div>
+      </div>
     </div>
 
-    <div id="status" class="status"></div>
+    <div class="main-content">
+    <div class="content-header">
+      <h2 id="pageTitle">Rules List</h2>
+    </div>
+    <div class="content-body">
+      <div id="rulesPage" class="page active" role="tabpanel" aria-labelledby="pageTitle">
+        <div class="add-rule-section">
+          <div class="section-title">Add New Rule</div>
+          <form id="addRuleForm" class="add-rule-form">
+            <div class="form-group">
+              <label for="newFrom">From URL Pattern</label>
+              <input type="text" id="newFrom" placeholder="e.g. go.zh" aria-describedby="newFromHelp">
+              <span id="newFromHelp" class="help-text">The URL pattern to match</span>
+            </div>
+            <div class="form-group">
+              <label for="newTo">To URL</label>
+              <input type="text" id="newTo" placeholder="e.g. cn.bing.com" aria-describedby="newToHelp">
+              <span id="newToHelp" class="help-text">The target URL to redirect to</span>
+            </div>
+            <div class="form-group">
+              <label for="newGroup">Group</label>
+              <select id="newGroup" aria-describedby="newGroupHelp">
+                <option value="">Auto Group</option>
+              </select>
+              <span id="newGroupHelp" class="help-text">Select a group to manage the rule</span>
+            </div>
+            <button type="button" id="addRuleBtn" class="add-btn">Add Rule</button>
+          </form>
+        </div>
+
+        <div class="section-title">
+          <span>Groups</span>
+          <button class="add-group-btn" title="Add New Group" aria-label="Add New Group">➕</button>
+        </div>
+        <div id="groupsContainer" class="groups-container" role="list" aria-label="Rules groups"></div>
+      </div>
+
+      <div id="syncPage" class="page" role="tabpanel" aria-labelledby="syncPageTitle">
+        <div class="sync-settings">
+          <div class="setting-item">
+            <label class="checkbox-label">
+              <input type="checkbox" id="enableSync">
+              Enable synchronization
+            </label>
+          </div>
+          <div class="setting-item">
+            <label for="serverUrl">Server URL</label>
+            <input type="url" id="serverUrl" placeholder="https://api.example.com/redirect" aria-describedby="serverUrlHelp">
+            <span id="serverUrlHelp" class="help-text">The server endpoint for synchronization</span>
+          </div>
+          <div class="setting-item">
+            <label for="apiKey">API Key</label>
+            <input type="text" id="apiKey" placeholder="your-secret-key" aria-describedby="apiKeyHelp">
+            <span id="apiKeyHelp" class="help-text">Your API key for authentication</span>
+          </div>
+          <div class="setting-item">
+            <label class="checkbox-label">
+              <input type="checkbox" id="autoDownload">
+              Auto-download rules on browser start
+            </label>
+          </div>
+          <div class="setting-actions">
+            <button class="primary-btn" id="saveSettingsBtn">Save Settings</button>
+            <button class="secondary-btn" id="downloadBtn">Download Now</button>
+          </div>
+          <div id="status" class="status" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="groupModal" class="group-edit-modal" role="dialog" aria-modal="true" aria-labelledby="groupModalTitle">
+    <div class="modal-content">
+      <h3 id="groupModalTitle">Edit Group</h3>
+      <form id="groupForm">
+        <div class="modal-field">
+          <label for="groupName">Group Name</label>
+          <input type="text" id="groupName" placeholder="Group name" required>
+        </div>
+        <div class="auto-rules-section">
+          <h4>Auto-group Rules</h4>
+          <p>Rules matching these conditions will be automatically added to this group.</p>
+          <div id="autoRulesList" role="list" aria-label="Auto-group conditions"></div>
+          <button type="button" class="add-auto-rule-btn" id="addAutoRuleBtn">+ Add Condition</button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" id="cancelGroupBtn">Cancel</button>
+          <button type="submit" class="save-btn" id="saveGroupBtn">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="editRuleModal" class="edit-rule-modal" role="dialog" aria-modal="true" aria-labelledby="editRuleModalTitle">
+    <div class="modal-content">
+      <h3 id="editRuleModalTitle">Edit Rule</h3>
+      <form id="editRuleForm">
+        <div class="modal-field">
+          <label for="editFrom">From URL Pattern</label>
+          <input type="text" id="editFrom" placeholder="From URL pattern" required>
+        </div>
+        <div class="modal-field">
+          <label for="editTo">To URL</label>
+          <input type="text" id="editTo" placeholder="To URL" required>
+        </div>
+        <div class="modal-field">
+          <label for="editGroup">Group</label>
+          <select id="editGroup" required></select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" id="cancelEditRuleBtn">Cancel</button>
+          <button type="submit" class="save-btn" id="saveEditRuleBtn">Save</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script src="options.js"></script>

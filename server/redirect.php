@@ -12,11 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 function isHttps() {
-    // 标准 HTTPS 检查
     if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
         return true;
     }
-    // 反向代理传递的协议头
     if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
         return true;
     }
@@ -54,10 +52,16 @@ switch ($method) {
             $content = file_get_contents($storageFile);
             $data = json_decode($content, true);
             if (!is_array($data)) {
-                $data = [];
+                $data = ['rules' => [], 'groups' => []];
+            }
+            if (!isset($data['rules'])) {
+                $data['rules'] = [];
+            }
+            if (!isset($data['groups'])) {
+                $data['groups'] = [];
             }
         } else {
-            $data = [];
+            $data = ['rules' => [], 'groups' => []];
         }
         header('Content-Type: application/json');
         echo json_encode($data);
@@ -65,15 +69,30 @@ switch ($method) {
 
     case 'POST':
         $input = file_get_contents('php://input');
-        $rules = json_decode($input, true);
-        if (!is_array($rules)) {
+        $payload = json_decode($input, true);
+        
+        if (!is_array($payload)) {
             http_response_code(400);
             header('Content-Type: application/json');
             echo json_encode(['error' => 'Invalid JSON data']);
             exit;
         }
 
-        foreach ($rules as $rule) {
+        if (!isset($payload['rules']) || !is_array($payload['rules'])) {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Missing or invalid rules array']);
+            exit;
+        }
+
+        if (!isset($payload['groups']) || !is_array($payload['groups'])) {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Missing or invalid groups array']);
+            exit;
+        }
+
+        foreach ($payload['rules'] as $rule) {
             if (!isset($rule['id'], $rule['from'], $rule['to'], $rule['enabled'])) {
                 http_response_code(400);
                 header('Content-Type: application/json');
@@ -82,10 +101,25 @@ switch ($method) {
             }
         }
 
+        foreach ($payload['groups'] as $group) {
+            if (!isset($group['id'], $group['name'])) {
+                http_response_code(400);
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Malformed group object', 'expected' => 'id, name']);
+                exit;
+            }
+            if (isset($group['autoRules']) && !is_array($group['autoRules'])) {
+                http_response_code(400);
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'autoRules must be an array']);
+                exit;
+            }
+        }
+
         $fp = fopen($storageFile, 'c');
         if (flock($fp, LOCK_EX)) {
             ftruncate($fp, 0);
-            fwrite($fp, json_encode($rules, JSON_PRETTY_PRINT));
+            fwrite($fp, json_encode($payload, JSON_PRETTY_PRINT));
             fflush($fp);
             flock($fp, LOCK_UN);
         } else {
