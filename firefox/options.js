@@ -204,28 +204,48 @@ class OptionsManager {
   createGroupHeader(group, groupRules) {
     const header = document.createElement('div');
     header.className = 'group-header';
-    header.innerHTML = `
-      <div class="group-title">
-        <span>${this.escapeHtml(group.name)}</span>
-        <span class="group-count">${groupRules.length}</span>
-      </div>
-      <div class="group-actions">
-        <button class="edit-group-btn" title="编辑分组">✏️</button>
-        ${group.id !== UNGROUPED_ID ? '<button class="delete-group-btn" title="删除分组">🗑️</button>' : ''}
-      </div>
-    `;
 
-    header.querySelector('.edit-group-btn').addEventListener('click', (e) => {
+    // 创建分组标题
+    const groupTitle = document.createElement('div');
+    groupTitle.className = 'group-title';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = group.name;
+    groupTitle.appendChild(nameSpan);
+
+    const countSpan = document.createElement('span');
+    countSpan.className = 'group-count';
+    countSpan.textContent = groupRules.length;
+    groupTitle.appendChild(countSpan);
+
+    // 创建分组操作按钮
+    const groupActions = document.createElement('div');
+    groupActions.className = 'group-actions';
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'edit-group-btn';
+    editBtn.title = '编辑分组';
+    editBtn.textContent = '✏️';
+    editBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       this.openEditGroupModal(group.id);
     });
+    groupActions.appendChild(editBtn);
 
     if (group.id !== UNGROUPED_ID) {
-      header.querySelector('.delete-group-btn').addEventListener('click', (e) => {
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-group-btn';
+      deleteBtn.title = '删除分组';
+      deleteBtn.textContent = '🗑️';
+      deleteBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         this.deleteGroup(group.id);
       });
+      groupActions.appendChild(deleteBtn);
     }
+
+    header.appendChild(groupTitle);
+    header.appendChild(groupActions);
 
     return header;
   }
@@ -254,17 +274,55 @@ class OptionsManager {
     card.draggable = true;
     card.dataset.ruleId = rule.id;
 
-    card.innerHTML = `
-      <input type="checkbox" class="rule-checkbox" ${rule.enabled ? 'checked' : ''}>
-      <div class="rule-content">
-        <div class="rule-from">${this.escapeHtml(rule.from)}</div>
-        <div class="rule-to"><span class="rule-arrow">→</span> ${this.escapeHtml(rule.to)}</div>
-      </div>
-      <div class="rule-actions">
-        <button class="edit-btn" title="编辑">✏️</button>
-        <button class="delete-btn" title="删除">×</button>
-      </div>
-    `;
+    // 创建复选框
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'rule-checkbox';
+    if (rule.enabled) {
+      checkbox.checked = true;
+    }
+    card.appendChild(checkbox);
+
+    // 创建规则内容
+    const ruleContent = document.createElement('div');
+    ruleContent.className = 'rule-content';
+
+    const ruleFrom = document.createElement('div');
+    ruleFrom.className = 'rule-from';
+    ruleFrom.textContent = rule.from;
+    ruleContent.appendChild(ruleFrom);
+
+    const ruleTo = document.createElement('div');
+    ruleTo.className = 'rule-to';
+
+    const ruleArrow = document.createElement('span');
+    ruleArrow.className = 'rule-arrow';
+    ruleArrow.textContent = '→';
+    ruleTo.appendChild(ruleArrow);
+
+    const toText = document.createTextNode(' ' + rule.to);
+    ruleTo.appendChild(toText);
+
+    ruleContent.appendChild(ruleTo);
+    card.appendChild(ruleContent);
+
+    // 创建规则操作按钮
+    const ruleActions = document.createElement('div');
+    ruleActions.className = 'rule-actions';
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'edit-btn';
+    editBtn.title = '编辑';
+    editBtn.textContent = '✏️';
+    ruleActions.appendChild(editBtn);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.title = '删除';
+    deleteBtn.textContent = '×';
+    ruleActions.appendChild(deleteBtn);
+
+    card.appendChild(ruleActions);
 
     this.bindRuleCardEvents(card, rule);
     return card;
@@ -334,12 +392,30 @@ class OptionsManager {
   }
 
   updateGroupSelects() {
-    const options = this.groups.map(g => 
-      `<option value="${g.id}">${this.escapeHtml(g.name)}</option>`
-    ).join('');
+    // 更新 newGroupSelect
+    this.elements.newGroupSelect.innerHTML = '';
     
-    this.elements.newGroupSelect.innerHTML = '<option value="">选择分组</option>' + options;
-    this.elements.editGroupSelect.innerHTML = options;
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = '选择分组';
+    this.elements.newGroupSelect.appendChild(defaultOption);
+    
+    this.groups.forEach(group => {
+      const option = document.createElement('option');
+      option.value = group.id;
+      option.textContent = group.name;
+      this.elements.newGroupSelect.appendChild(option);
+    });
+    
+    // 更新 editGroupSelect
+    this.elements.editGroupSelect.innerHTML = '';
+    
+    this.groups.forEach(group => {
+      const option = document.createElement('option');
+      option.value = group.id;
+      option.textContent = group.name;
+      this.elements.editGroupSelect.appendChild(option);
+    });
   }
 
   async addRule() {
@@ -411,19 +487,43 @@ class OptionsManager {
     const field = existingRule ? existingRule.field : 'from';
     const keyword = existingRule ? existingRule.keyword : '';
     
-    item.innerHTML = `
-      <select class="auto-rule-field">
-        ${AUTO_RULE_FIELDS.map(f => 
-          `<option value="${f}" ${field === f ? 'selected' : ''}>${f === 'from' ? '源URL' : f === 'to' ? '目标URL' : '两者都'} </option>`
-        ).join('')}
-      </select>
-      <input type="text" class="auto-rule-keyword" placeholder="包含..." value="${this.escapeHtml(keyword)}">
-      <button class="remove-auto-rule-btn">×</button>
-    `;
-
-    item.querySelector('.remove-auto-rule-btn').addEventListener('click', () => {
+    // 创建选择框
+    const select = document.createElement('select');
+    select.className = 'auto-rule-field';
+    
+    AUTO_RULE_FIELDS.forEach(f => {
+      const option = document.createElement('option');
+      option.value = f;
+      if (field === f) {
+        option.selected = true;
+      }
+      if (f === 'from') {
+        option.textContent = '源URL';
+      } else if (f === 'to') {
+        option.textContent = '目标URL';
+      } else {
+        option.textContent = '两者都';
+      }
+      select.appendChild(option);
+    });
+    item.appendChild(select);
+    
+    // 创建输入框
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'auto-rule-keyword';
+    input.placeholder = '包含...';
+    input.value = keyword;
+    item.appendChild(input);
+    
+    // 创建删除按钮
+    const button = document.createElement('button');
+    button.className = 'remove-auto-rule-btn';
+    button.textContent = '×';
+    button.addEventListener('click', () => {
       item.remove();
     });
+    item.appendChild(button);
 
     this.elements.autoRulesList.appendChild(item);
   }

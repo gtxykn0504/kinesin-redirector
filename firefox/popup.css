@@ -229,96 +229,16 @@ h1 {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 400px) {
   body {
-    min-width: 280px;
-    max-width: 100vw;
+    min-width: 320px;
   }
   
   .header {
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-  
-  h1 {
-    font-size: var(--font-size-base);
-  }
-  
-  .settings-icon {
-    font-size: var(--font-size-base);
+    padding: var(--spacing-md) var(--spacing-lg);
   }
   
   .add-form {
-    padding: var(--spacing-md);
-  }
-  
-  .form-group {
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .form-group label {
-    font-size: var(--font-size-sm);
-    margin-bottom: var(--spacing-xs);
-  }
-  
-  .form-group input,
-  .form-group select {
-    padding: 8px var(--spacing-sm);
-    font-size: var(--font-size-sm);
-  }
-  
-  .add-btn {
-    padding: 10px var(--spacing-md);
-    font-size: var(--font-size-sm);
-  }
-  
-  .sync-status {
-    font-size: var(--font-size-sm);
-    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
-  }
-}
-
-@media (max-width: 360px) {
-  body {
-    min-width: 260px;
-  }
-  
-  .header {
-    padding: var(--spacing-xs) var(--spacing-sm);
-  }
-  
-  h1 {
-    font-size: var(--font-size-sm);
-  }
-  
-  .settings-icon {
-    font-size: var(--font-size-sm);
-  }
-  
-  .add-form {
-    padding: var(--spacing-sm);
-  }
-  
-  .form-group {
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  .form-group label {
-    font-size: 11px;
-  }
-  
-  .form-group input,
-  .form-group select {
-    padding: 6px var(--spacing-sm);
-    font-size: 12px;
-  }
-  
-  .add-btn {
-    padding: 8px var(--spacing-sm);
-    font-size: 12px;
-  }
-  
-  .sync-status {
-    font-size: 11px;
-    padding: var(--spacing-xs) var(--spacing-sm);
+    padding: var(--spacing-lg);
   }
 }

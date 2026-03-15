@@ -113,11 +113,19 @@ class PopupManager {
   }
 
   updateGroupSelect() {
-    const options = this.groups.map(g => 
-      `<option value="${g.id}">${this.escapeHtml(g.name)}</option>`
-    ).join('');
+    this.elements.groupSelectEl.innerHTML = '';
     
-    this.elements.groupSelectEl.innerHTML = '<option value="">自动分组</option>' + options;
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = '自动分组';
+    this.elements.groupSelectEl.appendChild(defaultOption);
+    
+    this.groups.forEach(group => {
+      const option = document.createElement('option');
+      option.value = group.id;
+      option.textContent = group.name;
+      this.elements.groupSelectEl.appendChild(option);
+    });
   }
 
   async save() {
