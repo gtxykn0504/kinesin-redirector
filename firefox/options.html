@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kinesin Settings</title>
+  <title>Kinesin 设置</title>
   <link rel="stylesheet" href="options.css">
   <script src="common.js"></script>
 </head>
@@ -13,20 +13,20 @@
       <div class="sidebar-header">
         <h1>Kinesin</h1>
       </div>
-      <nav class="sidebar-nav" aria-label="Main navigation">
+      <nav class="sidebar-nav" aria-label="主导航">
         <div class="nav-item active" data-page="rules" role="button" tabindex="0" aria-current="page">
           <span class="nav-icon" aria-hidden="true">📋</span>
-          <span>Rules List</span>
+          <span>规则列表</span>
         </div>
         <div class="nav-item" data-page="sync" role="button" tabindex="0">
           <span class="nav-icon" aria-hidden="true">🔄</span>
-          <span>Sync Settings</span>
+          <span>同步设置</span>
         </div>
       </nav>
       <div class="sidebar-footer">
         <div id="syncStatus" class="sync-indicator" role="status" aria-live="polite">
           <span class="sync-dot"></span>
-          <span class="sync-text">Ready</span>
+          <span class="sync-text">就绪</span>
         </div>
         <div class="version-info">
           <span class="version">Version 1.2</span>
@@ -37,39 +37,38 @@
 
     <div class="main-content">
     <div class="content-header">
-      <h2 id="pageTitle">Rules List</h2>
+      <h2 id="pageTitle">规则列表</h2>
     </div>
     <div class="content-body">
       <div id="rulesPage" class="page active" role="tabpanel" aria-labelledby="pageTitle">
         <div class="add-rule-section">
-          <div class="section-title">Add New Rule</div>
           <form id="addRuleForm" class="add-rule-form">
             <div class="form-group">
-              <label for="newFrom">From URL Pattern</label>
-              <input type="text" id="newFrom" placeholder="e.g. go.zh" aria-describedby="newFromHelp">
-              <span id="newFromHelp" class="help-text">The URL pattern to match</span>
+              <label for="newFrom">源 URL</label>
+              <input type="text" id="newFrom" placeholder="例如：go.zh" aria-describedby="newFromHelp">
+              <span id="newFromHelp" class="help-text">要匹配的 URL 模式</span>
             </div>
             <div class="form-group">
-              <label for="newTo">To URL</label>
-              <input type="text" id="newTo" placeholder="e.g. cn.bing.com" aria-describedby="newToHelp">
-              <span id="newToHelp" class="help-text">The target URL to redirect to</span>
+              <label for="newTo">目标 URL</label>
+              <input type="text" id="newTo" placeholder="例如：cn.bing.com" aria-describedby="newToHelp">
+              <span id="newToHelp" class="help-text">重定向到的目标 URL</span>
             </div>
             <div class="form-group">
-              <label for="newGroup">Group</label>
+              <label for="newGroup">分组</label>
               <select id="newGroup" aria-describedby="newGroupHelp">
-                <option value="">Auto Group</option>
+                <option value="">自动分组</option>
               </select>
-              <span id="newGroupHelp" class="help-text">Select a group to manage the rule</span>
+              <span id="newGroupHelp" class="help-text">选择一个分组来管理规则</span>
             </div>
-            <button type="button" id="addRuleBtn" class="add-btn">Add Rule</button>
+            <button type="button" id="addRuleBtn" class="add-btn">添加规则</button>
           </form>
         </div>
 
         <div class="section-title">
-          <span>Groups</span>
-          <button class="add-group-btn" title="Add New Group" aria-label="Add New Group">➕</button>
+          <span>分组</span>
+          <button class="add-group-btn" title="添加新分组" aria-label="添加新分组">➕</button>
         </div>
-        <div id="groupsContainer" class="groups-container" role="list" aria-label="Rules groups"></div>
+        <div id="groupsContainer" class="groups-container" role="list" aria-label="规则分组"></div>
       </div>
 
       <div id="syncPage" class="page" role="tabpanel" aria-labelledby="syncPageTitle">
@@ -77,28 +76,28 @@
           <div class="setting-item">
             <label class="checkbox-label">
               <input type="checkbox" id="enableSync">
-              Enable synchronization
+              启用同步
             </label>
           </div>
           <div class="setting-item">
-            <label for="serverUrl">Server URL</label>
+            <label for="serverUrl">服务器 URL</label>
             <input type="url" id="serverUrl" placeholder="https://api.example.com/redirect" aria-describedby="serverUrlHelp">
-            <span id="serverUrlHelp" class="help-text">The server endpoint for synchronization</span>
+            <span id="serverUrlHelp" class="help-text">同步的服务器端点</span>
           </div>
           <div class="setting-item">
-            <label for="apiKey">API Key</label>
+            <label for="apiKey">API 密钥</label>
             <input type="text" id="apiKey" placeholder="your-secret-key" aria-describedby="apiKeyHelp">
-            <span id="apiKeyHelp" class="help-text">Your API key for authentication</span>
+            <span id="apiKeyHelp" class="help-text">用于身份验证的 API 密钥</span>
           </div>
           <div class="setting-item">
             <label class="checkbox-label">
               <input type="checkbox" id="autoDownload">
-              Auto-download rules on browser start
+              浏览器启动时自动下载规则
             </label>
           </div>
           <div class="setting-actions">
-            <button class="primary-btn" id="saveSettingsBtn">Save Settings</button>
-            <button class="secondary-btn" id="downloadBtn">Download Now</button>
+            <button class="primary-btn" id="saveSettingsBtn">保存设置</button>
+            <button class="secondary-btn" id="downloadBtn">立即下载</button>
           </div>
           <div id="status" class="status" role="status" aria-live="polite"></div>
         </div>
@@ -108,21 +107,21 @@
 
   <div id="groupModal" class="group-edit-modal" role="dialog" aria-modal="true" aria-labelledby="groupModalTitle">
     <div class="modal-content">
-      <h3 id="groupModalTitle">Edit Group</h3>
+      <h3 id="groupModalTitle">编辑分组</h3>
       <form id="groupForm">
         <div class="modal-field">
-          <label for="groupName">Group Name</label>
-          <input type="text" id="groupName" placeholder="Group name" required>
+          <label for="groupName">分组名称</label>
+          <input type="text" id="groupName" placeholder="分组名称" required>
         </div>
         <div class="auto-rules-section">
-          <h4>Auto-group Rules</h4>
-          <p>Rules matching these conditions will be automatically added to this group.</p>
-          <div id="autoRulesList" role="list" aria-label="Auto-group conditions"></div>
-          <button type="button" class="add-auto-rule-btn" id="addAutoRuleBtn">+ Add Condition</button>
+          <h4>自动分组规则</h4>
+          <p>匹配这些条件的规则将自动添加到该分组。</p>
+          <div id="autoRulesList" role="list" aria-label="自动分组条件"></div>
+          <button type="button" class="add-auto-rule-btn" id="addAutoRuleBtn">+ 添加条件</button>
         </div>
         <div class="modal-actions">
-          <button type="button" class="cancel-btn" id="cancelGroupBtn">Cancel</button>
-          <button type="submit" class="save-btn" id="saveGroupBtn">Save</button>
+          <button type="button" class="cancel-btn" id="cancelGroupBtn">取消</button>
+          <button type="submit" class="save-btn" id="saveGroupBtn">保存</button>
         </div>
       </form>
     </div>
@@ -130,23 +129,23 @@
 
   <div id="editRuleModal" class="edit-rule-modal" role="dialog" aria-modal="true" aria-labelledby="editRuleModalTitle">
     <div class="modal-content">
-      <h3 id="editRuleModalTitle">Edit Rule</h3>
+      <h3 id="editRuleModalTitle">编辑规则</h3>
       <form id="editRuleForm">
         <div class="modal-field">
-          <label for="editFrom">From URL Pattern</label>
-          <input type="text" id="editFrom" placeholder="From URL pattern" required>
+          <label for="editFrom">源 URL</label>
+          <input type="text" id="editFrom" placeholder="源 URL" required>
         </div>
         <div class="modal-field">
-          <label for="editTo">To URL</label>
-          <input type="text" id="editTo" placeholder="To URL" required>
+          <label for="editTo">目标 URL</label>
+          <input type="text" id="editTo" placeholder="目标 URL" required>
         </div>
         <div class="modal-field">
-          <label for="editGroup">Group</label>
+          <label for="editGroup">分组</label>
           <select id="editGroup" required></select>
         </div>
         <div class="modal-actions">
-          <button type="button" class="cancel-btn" id="cancelEditRuleBtn">Cancel</button>
-          <button type="submit" class="save-btn" id="saveEditRuleBtn">Save</button>
+          <button type="button" class="cancel-btn" id="cancelEditRuleBtn">取消</button>
+          <button type="submit" class="save-btn" id="saveEditRuleBtn">保存</button>
         </div>
       </form>
     </div>

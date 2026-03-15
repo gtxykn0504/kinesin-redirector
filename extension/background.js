@@ -77,7 +77,7 @@ async function syncDynamicRules() {
       addRules: dnrRules
     });
     
-    console.log(`Synced ${dnrRules.length} dynamic rules`);
+    console.log(`Updating ${dnrRules.length} dynamic rules`);
   } catch (error) {
     console.error('Failed to sync dynamic rules:', error);
   }
@@ -130,7 +130,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && changes[STORAGE_KEY]) {
-    console.log('Rules changed, syncing dynamic rules...');
+    console.log('Rules changed, updating dynamic rules...');
     syncDynamicRules();
   }
 });

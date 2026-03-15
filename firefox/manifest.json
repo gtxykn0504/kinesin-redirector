@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Kinesin",
-  "version": "1.1",
-  "description": "URL redirect rules with optional remote sync",
+  "version": "1.2",
+  "description": "远程同步功能的URL重定向规则插件",
   "permissions": [
     "storage",
     "declarativeNetRequest"
@@ -32,7 +32,7 @@
       "data_collection_permissions": {
         "required": ["browsingActivity"]
       },
-      "strict_min_version": "140.0"
+      "strict_min_version": "142.0"
     }
   }
 }

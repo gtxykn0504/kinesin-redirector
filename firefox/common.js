@@ -7,7 +7,6 @@ const UNGROUPED_ID = 'ungrouped';
 const UNGROUPED_NAME = 'Ungrouped';
 
 const AUTO_RULE_FIELDS = ['from', 'to', 'both'];
-const MAX_RULES = 50;
 
 const SyncStatus = {
   IDLE: 'idle',
@@ -43,7 +42,7 @@ class SyncManager {
       return null;
     }
 
-    this.setStatus(SyncStatus.DOWNLOADING, 'Downloading...');
+    this.setStatus(SyncStatus.DOWNLOADING, '下载中...');
 
     try {
       const url = new URL(config.serverUrl);
@@ -79,7 +78,7 @@ class SyncManager {
         [LAST_SYNC_KEY]: Date.now()
       });
 
-      this.setStatus(SyncStatus.DOWNLOADED, 'Downloaded');
+      this.setStatus(SyncStatus.DOWNLOADED, '已下载');
       
       setTimeout(() => {
         if (this.status === SyncStatus.DOWNLOADED) {
@@ -89,8 +88,8 @@ class SyncManager {
 
       return { rules, groups };
     } catch (error) {
-      console.error('Download failed:', error);
-      this.setStatus(SyncStatus.ERROR, 'Download failed');
+      console.error('下载失败:', error);
+      this.setStatus(SyncStatus.ERROR, '下载失败');
       throw error;
     }
   }
@@ -101,7 +100,7 @@ class SyncManager {
       return;
     }
 
-    this.setStatus(SyncStatus.UPLOADING, 'Uploading...');
+    this.setStatus(SyncStatus.UPLOADING, '上传中...');
 
     try {
       const url = new URL(config.serverUrl);
@@ -123,7 +122,7 @@ class SyncManager {
         [LAST_SYNC_KEY]: Date.now()
       });
 
-      this.setStatus(SyncStatus.UPLOADED, 'Uploaded');
+      this.setStatus(SyncStatus.UPLOADED, '已上传');
       
       setTimeout(() => {
         if (this.status === SyncStatus.UPLOADED) {
@@ -131,8 +130,8 @@ class SyncManager {
         }
       }, 2000);
     } catch (error) {
-      console.error('Upload failed:', error);
-      this.setStatus(SyncStatus.ERROR, 'Upload failed');
+      console.error('上传失败:', error);
+      this.setStatus(SyncStatus.ERROR, '上传失败');
       throw error;
     }
   }

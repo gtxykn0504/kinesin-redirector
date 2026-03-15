@@ -119,7 +119,7 @@ class OptionsManager {
       this.loadSyncSettings();
     } catch (error) {
       console.error('Initialization failed:', error);
-      this.showStatus('Failed to load data', 'error');
+      this.showStatus('加载数据失败', 'error');
     }
   }
 
@@ -210,8 +210,8 @@ class OptionsManager {
         <span class="group-count">${groupRules.length}</span>
       </div>
       <div class="group-actions">
-        <button class="edit-group-btn" title="Edit Group">✏️</button>
-        ${group.id !== UNGROUPED_ID ? '<button class="delete-group-btn" title="Delete Group">🗑️</button>' : ''}
+        <button class="edit-group-btn" title="编辑分组">✏️</button>
+        ${group.id !== UNGROUPED_ID ? '<button class="delete-group-btn" title="删除分组">🗑️</button>' : ''}
       </div>
     `;
 
@@ -236,7 +236,7 @@ class OptionsManager {
     rulesList.dataset.groupId = group.id;
 
     if (groupRules.length === 0) {
-      rulesList.innerHTML = '<div class="empty-state"><div class="empty-state-text">No rules in this group</div></div>';
+      rulesList.innerHTML = '<div class="empty-state"><div class="empty-state-text">该分组中没有规则</div></div>';
     } else {
       groupRules.forEach(rule => {
         const card = this.createRuleCard(rule);
@@ -261,8 +261,8 @@ class OptionsManager {
         <div class="rule-to"><span class="rule-arrow">→</span> ${this.escapeHtml(rule.to)}</div>
       </div>
       <div class="rule-actions">
-        <button class="edit-btn" title="Edit">✏️</button>
-        <button class="delete-btn" title="Delete">×</button>
+        <button class="edit-btn" title="编辑">✏️</button>
+        <button class="delete-btn" title="删除">×</button>
       </div>
     `;
 
@@ -338,7 +338,7 @@ class OptionsManager {
       `<option value="${g.id}">${this.escapeHtml(g.name)}</option>`
     ).join('');
     
-    this.elements.newGroupSelect.innerHTML = '<option value="">Select Group</option>' + options;
+    this.elements.newGroupSelect.innerHTML = '<option value="">选择分组</option>' + options;
     this.elements.editGroupSelect.innerHTML = options;
   }
 
@@ -348,7 +348,7 @@ class OptionsManager {
     let groupId = this.elements.newGroupSelect.value;
 
     if (!from || !to) {
-      this.showStatus('Please fill in both fields', 'error');
+      this.showStatus('请填写两个字段', 'error');
       return;
     }
 
@@ -366,7 +366,7 @@ class OptionsManager {
 
     this.clearNewRuleForm();
     await this.save();
-    this.showStatus('Rule added', 'success');
+    this.showStatus('规则已添加', 'success');
   }
 
   clearNewRuleForm() {
@@ -377,7 +377,7 @@ class OptionsManager {
 
   openAddGroupModal() {
     this.editingGroupId = null;
-    this.elements.groupModalTitle.textContent = 'Add Group';
+    this.elements.groupModalTitle.textContent = '添加分组';
     this.elements.groupNameInput.value = '';
     this.elements.autoRulesList.innerHTML = '';
     this.elements.groupModal.classList.add('active');
@@ -388,7 +388,7 @@ class OptionsManager {
     if (!group) return;
 
     this.editingGroupId = groupId;
-    this.elements.groupModalTitle.textContent = 'Edit Group';
+    this.elements.groupModalTitle.textContent = '编辑分组';
     this.elements.groupNameInput.value = group.name;
     
     this.elements.autoRulesList.innerHTML = '';
@@ -414,10 +414,10 @@ class OptionsManager {
     item.innerHTML = `
       <select class="auto-rule-field">
         ${AUTO_RULE_FIELDS.map(f => 
-          `<option value="${f}" ${field === f ? 'selected' : ''}>${f.charAt(0).toUpperCase() + f.slice(1)} URL</option>`
+          `<option value="${f}" ${field === f ? 'selected' : ''}>${f === 'from' ? '源URL' : f === 'to' ? '目标URL' : '两者都'} </option>`
         ).join('')}
       </select>
-      <input type="text" class="auto-rule-keyword" placeholder="Contains..." value="${this.escapeHtml(keyword)}">
+      <input type="text" class="auto-rule-keyword" placeholder="包含..." value="${this.escapeHtml(keyword)}">
       <button class="remove-auto-rule-btn">×</button>
     `;
 
@@ -431,7 +431,7 @@ class OptionsManager {
   async saveGroup() {
     const name = this.elements.groupNameInput.value.trim();
     if (!name) {
-      this.showStatus('Please enter a group name', 'error');
+      this.showStatus('请输入分组名称', 'error');
       return;
     }
 
@@ -446,7 +446,7 @@ class OptionsManager {
     this.closeGroupModal();
     this.applyAutoGrouping();
     await this.save();
-    this.showStatus('Group saved', 'success');
+    this.showStatus('分组已保存', 'success');
   }
 
   collectAutoRules() {
@@ -485,7 +485,7 @@ class OptionsManager {
 
     this.groups = this.groups.filter(g => g.id !== groupId);
     await this.save();
-    this.showStatus('Group deleted', 'success');
+    this.showStatus('分组已删除', 'success');
   }
 
   openEditRuleModal(ruleId) {
@@ -513,7 +513,7 @@ class OptionsManager {
     const groupId = this.elements.editGroupSelect.value;
 
     if (!from || !to) {
-      this.showStatus('Please fill in both fields', 'error');
+      this.showStatus('请填写两个字段', 'error');
       return;
     }
 
@@ -523,7 +523,7 @@ class OptionsManager {
 
     this.closeEditRuleModal();
     await this.save();
-    this.showStatus('Rule updated', 'success');
+    this.showStatus('规则已更新', 'success');
   }
 
   async save() {
@@ -566,20 +566,20 @@ class OptionsManager {
     };
     await chrome.storage.sync.set({ [CONFIG_KEY]: this.syncConfig });
     this.updateSyncStatusVisibility();
-    this.showStatus('Settings saved', 'success');
+    this.showStatus('设置已保存', 'success');
   }
 
   async manualDownload() {
     if (!this.syncConfig?.enabled || !this.syncConfig.serverUrl || !this.syncConfig.apiKey) {
-      this.showStatus('Synchronization is disabled or incomplete', 'error');
+      this.showStatus('同步已禁用或配置不完整', 'error');
       return;
     }
     
     try {
       await this.downloadFromServer();
-      this.showStatus('Download successful', 'success');
+      this.showStatus('下载成功', 'success');
     } catch (error) {
-      this.showStatus('Download failed: ' + error.message, 'error');
+      this.showStatus('下载失败: ' + error.message, 'error');
     }
   }
 
@@ -636,18 +636,18 @@ class OptionsManager {
   getStatusText(status) {
     switch (status) {
       case SyncStatus.DOWNLOADING:
-        return 'Downloading...';
+        return '正在下载...';
       case SyncStatus.DOWNLOADED:
-        return 'Downloaded';
+        return '已下载';
       case SyncStatus.UPLOADING:
-        return 'Uploading...';
+        return '正在上传...';
       case SyncStatus.UPLOADED:
-        return 'Uploaded';
+        return '已上传';
       case SyncStatus.ERROR:
-        return 'Error';
+        return '错误';
       case SyncStatus.IDLE:
       default:
-        return 'Ready';
+        return '就绪';
     }
   }
 

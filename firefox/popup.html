@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,28 +10,25 @@
 <body>
   <div class="header">
     <h1>Kinesin</h1>
-    <a href="/options.html" id="settingsLink" class="settings-icon" title="Settings" aria-label="Open Settings">⚙️</a>
+    <a href="/options.html" id="settingsLink" class="settings-icon" title="设置" aria-label="打开设置">⚙️</a>
   </div>
 
-  <form id="addForm" class="add-form" aria-label="Add new redirect rule">
+  <form id="addForm" class="add-form" aria-label="添加新的重定向规则">
     <div class="form-group">
-      <label for="pattern">From URL Pattern</label>
-      <input id="pattern" type="text" placeholder="e.g. bing.go" required aria-describedby="patternHelp">
-      <span id="patternHelp" class="help-text">The URL pattern to match</span>
+      <label for="pattern">源 URL</label>
+      <input id="pattern" type="text" placeholder="例如：bing.go" required aria-describedby="patternHelp">
     </div>
     <div class="form-group">
-      <label for="target">To URL</label>
-      <input id="target" type="text" placeholder="e.g. www.bing.com" required aria-describedby="targetHelp">
-      <span id="targetHelp" class="help-text">The target URL to redirect to</span>
+      <label for="target">目标 URL</label>
+      <input id="target" type="text" placeholder="例如：www.bing.com" required aria-describedby="targetHelp">
     </div>
     <div class="form-group">
-      <label for="groupSelect">Group</label>
+      <label for="groupSelect">分组</label>
       <select id="groupSelect" aria-describedby="groupSelectHelp">
-        <option value="">Auto Group</option>
+        <option value="">自动分组</option>
       </select>
-      <span id="groupSelectHelp" class="help-text">Select a group to manage the rule</span>
     </div>
-    <button type="submit" class="add-btn">Add Rule</button>
+    <button type="submit" class="add-btn">添加规则</button>
   </form>
 
   <div id="syncStatus" class="sync-status" role="status" aria-live="polite"></div>

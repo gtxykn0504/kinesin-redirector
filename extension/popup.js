@@ -82,16 +82,11 @@ class PopupManager {
   async handleSubmit(e) {
     e.preventDefault();
 
-    if (this.rules.length >= MAX_RULES) {
-      this.updateSyncStatus(SyncStatus.ERROR, `Max ${MAX_RULES} rules`);
-      return;
-    }
-
     const from = this.elements.patternEl.value.trim();
     const to = this.elements.targetEl.value.trim();
 
     if (!from || !to) {
-      this.updateSyncStatus(SyncStatus.ERROR, 'Please fill in both fields');
+      this.updateSyncStatus(SyncStatus.ERROR, '请填写所有字段');
       return;
     }
 
@@ -110,7 +105,7 @@ class PopupManager {
 
     await this.save();
     this.clearForm();
-    this.updateSyncStatus(SyncStatus.UPLOADED, 'Rule added');
+    this.updateSyncStatus(SyncStatus.UPLOADED, '规则已添加');
   }
 
   clearForm() {
@@ -122,7 +117,7 @@ class PopupManager {
       `<option value="${g.id}">${this.escapeHtml(g.name)}</option>`
     ).join('');
     
-    this.elements.groupSelectEl.innerHTML = '<option value="">Auto Group</option>' + options;
+    this.elements.groupSelectEl.innerHTML = '<option value="">自动分组</option>' + options;
   }
 
   async save() {
@@ -180,18 +175,18 @@ class PopupManager {
   getStatusText(status) {
     switch (status) {
       case SyncStatus.DOWNLOADING:
-        return 'Downloading...';
+        return '下载中...';
       case SyncStatus.DOWNLOADED:
-        return 'Downloaded';
+        return '已下载';
       case SyncStatus.UPLOADING:
-        return 'Uploading...';
+        return '上传中...';
       case SyncStatus.UPLOADED:
-        return 'Uploaded';
+        return '已上传';
       case SyncStatus.ERROR:
-        return 'Error';
+        return '错误';
       case SyncStatus.IDLE:
       default:
-        return 'Ready';
+        return '就绪';
     }
   }
 

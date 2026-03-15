@@ -115,11 +115,6 @@ body {
   font-weight: 500;
 }
 
-.nav-item:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary-color);
-}
-
 .nav-icon {
   margin-right: var(--spacing-sm);
   font-size: var(--font-size-base);
@@ -240,7 +235,6 @@ body {
   background-position: right 12px center;
   padding-right: 32px;
 }
-
 
 .add-btn {
   padding: 10px var(--spacing-xl);
@@ -901,7 +895,6 @@ body {
   text-decoration: none;
   transition: color var(--transition-fast);
 }
-
 
 .help-text {
   font-size: var(--font-size-xs);
