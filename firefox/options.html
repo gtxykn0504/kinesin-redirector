@@ -8,6 +8,7 @@
   <script src="common.js"></script>
 </head>
 <body>
+  <div id="status" class="status" role="status" aria-live="polite"></div>
   <div class="container">
     <div class="sidebar">
       <div class="sidebar-header">
@@ -22,6 +23,10 @@
           <span class="nav-icon" aria-hidden="true">🔄</span>
           <span>同步设置</span>
         </div>
+        <a class="nav-item" href="https://docs.kegongteng.cn/kinesin/" target="_blank" role="link" tabindex="0">
+          <span class="nav-icon" aria-hidden="true">📖</span>
+          <span>文档</span>
+        </a>
       </nav>
       <div class="sidebar-footer">
         <div id="syncStatus" class="sync-indicator" role="status" aria-live="polite">
@@ -92,14 +97,13 @@
           <div class="setting-item">
             <label class="checkbox-label">
               <input type="checkbox" id="autoDownload">
-              浏览器启动时自动下载规则
+              自动下载规则
             </label>
           </div>
           <div class="setting-actions">
             <button class="primary-btn" id="saveSettingsBtn">保存设置</button>
-            <button class="secondary-btn" id="downloadBtn">立即下载</button>
+            <button class="secondary-btn" id="downloadBtn">手动同步</button>
           </div>
-          <div id="status" class="status" role="status" aria-live="polite"></div>
         </div>
       </div>
     </div>

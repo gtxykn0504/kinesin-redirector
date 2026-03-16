@@ -78,7 +78,6 @@ class OptionsManager {
     if (groupForm) {
       groupForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        this.saveGroup();
       });
     }
 
@@ -397,7 +396,7 @@ class OptionsManager {
     
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
-    defaultOption.textContent = '选择分组';
+    defaultOption.textContent = '自动分组';
     this.elements.newGroupSelect.appendChild(defaultOption);
     
     this.groups.forEach(group => {

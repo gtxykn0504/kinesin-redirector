@@ -102,6 +102,7 @@ body {
   border-radius: var(--border-radius-md);
   margin-bottom: var(--spacing-xs);
   color: var(--text-secondary);
+  text-decoration: none;
 }
 
 .nav-item:hover {
@@ -787,11 +788,16 @@ body {
 }
 
 .status {
-  margin-top: var(--spacing-lg);
-  padding: 10px var(--spacing-md);
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px var(--spacing-lg);
   border-radius: var(--border-radius-md);
   font-size: var(--font-size-sm);
   line-height: 1.4;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideInRight 0.3s ease-out;
 }
 
 .status:empty {
@@ -806,6 +812,17 @@ body {
 .status.error {
   background: var(--error-bg);
   color: var(--error-color);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .empty-state {
