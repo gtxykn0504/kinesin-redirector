@@ -14,7 +14,7 @@ class OptionsManager {
 
   initializeElements() {
     this.elements = {
-      navItems: document.querySelectorAll('.nav-item'),
+      navItems: document.querySelectorAll('.nav-item[data-page]'),
       pages: document.querySelectorAll('.page'),
       pageTitle: document.getElementById('pageTitle'),
       groupsContainer: document.getElementById('groupsContainer'),

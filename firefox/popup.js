@@ -31,9 +31,17 @@ class PopupManager {
   }
 
   bindNavigationEvents() {
-    this.elements.settingsLink.addEventListener('click', (e) => {
+    this.elements.settingsLink.addEventListener('click', async (e) => {
       e.preventDefault();
-      browser.runtime.openOptionsPage();
+
+      try {
+        await browser.runtime.openOptionsPage();
+      } catch (error) {
+        console.error('Failed to open options page:', error);
+      } finally {
+        // Some mobile browsers keep the popup open after navigation.
+        window.close();
+      }
     });
   }
 
