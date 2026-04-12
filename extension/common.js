@@ -17,6 +17,14 @@ const SyncStatus = {
   ERROR: 'error'
 };
 
+// 同步模式常量
+const SyncMode = {
+  MANUAL: 'manual',          // 禁用自动同步（仅手动）
+  STARTUP: 'startup',        // 浏览器启动时
+  POPUP: 'popup',            // 打开弹出窗口时
+  BOTH: 'both'              // 启动 + 打开弹出窗口
+};
+
 class SyncManager {
   constructor() {
     this.status = SyncStatus.IDLE;
@@ -39,6 +47,7 @@ class SyncManager {
   async downloadFromServer() {
     const config = await this.getSyncConfig();
     if (!this.isSyncEnabled(config)) {
+      console.log('Sync not configured or disabled');
       return null;
     }
 
@@ -142,7 +151,8 @@ class SyncManager {
   }
 
   isSyncEnabled(config) {
-    return config?.enabled && config.serverUrl && config.apiKey;
+    // 只要有服务器地址和API密钥即认为配置有效（模式不影响是否可用）
+    return config?.serverUrl && config?.apiKey;
   }
 
   validateRules(rules) {

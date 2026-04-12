@@ -23,7 +23,7 @@ class PopupManager {
   bindEvents() {
     this.bindFormEvents();
     this.bindNavigationEvents();
-    this.bindSyncEvents();
+    this.bindMessageListener();
   }
 
   bindFormEvents() {
@@ -33,35 +33,36 @@ class PopupManager {
   bindNavigationEvents() {
     this.elements.settingsLink.addEventListener('click', async (e) => {
       e.preventDefault();
-
       try {
         await chrome.runtime.openOptionsPage();
       } catch (error) {
         console.error('Failed to open options page:', error);
       } finally {
-        // Some mobile browsers keep the popup open after navigation.
         window.close();
       }
     });
   }
 
-  bindSyncEvents() {
-    if (typeof syncManager !== 'undefined') {
-      syncManager.addStatusListener((status, message) => {
-        this.updateSyncStatus(status, message);
-      });
-    }
+  bindMessageListener() {
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message.action === 'syncStatusUpdate') {
+        this.updateSyncStatus(message.status, message.message);
+      }
+    });
   }
 
   async init() {
     try {
-      await this.downloadFromServer();
       await this.loadData();
       this.updateGroupSelect();
       this.updateSyncStatusVisibility();
+      this.updateSyncStatus(SyncStatus.IDLE, '就绪');
+      
+      // 通知后台 popup 已打开（用于触发自动下载）
+      chrome.runtime.sendMessage({ action: 'popupOpened' }).catch(() => {});
     } catch (error) {
       console.error('Initialization failed:', error);
-      this.updateSyncStatus(SyncStatus.ERROR, 'Init error');
+      this.updateSyncStatus(SyncStatus.ERROR, '初始化错误');
     }
   }
 
@@ -70,26 +71,11 @@ class PopupManager {
     this.rules = syncManager.validateRules(data[STORAGE_KEY] || []);
     this.groups = syncManager.validateGroups(data[GROUPS_KEY] || []);
     this.syncConfig = data[CONFIG_KEY] || null;
-
     this.groups = syncManager.ensureDefaultGroup(this.groups);
-  }
-
-  async downloadFromServer() {
-    if (typeof syncManager === 'undefined') {
-      console.warn('SyncManager not available');
-      return;
-    }
-
-    try {
-      await syncManager.downloadFromServer();
-    } catch (error) {
-      console.error('Download failed:', error);
-    }
   }
 
   async handleSubmit(e) {
     e.preventDefault();
-
     const from = this.elements.patternEl.value.trim();
     const to = this.elements.targetEl.value.trim();
 
@@ -113,7 +99,6 @@ class PopupManager {
 
     await this.save();
     this.clearForm();
-    this.updateSyncStatus(SyncStatus.UPLOADED, '规则已添加');
   }
 
   clearForm() {
@@ -122,12 +107,10 @@ class PopupManager {
 
   updateGroupSelect() {
     this.elements.groupSelectEl.innerHTML = '';
-    
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = '自动分组';
     this.elements.groupSelectEl.appendChild(defaultOption);
-    
     this.groups.forEach(group => {
       const option = document.createElement('option');
       option.value = group.id;
@@ -141,29 +124,25 @@ class PopupManager {
       [STORAGE_KEY]: this.rules,
       [GROUPS_KEY]: this.groups
     });
-    await this.uploadToServer();
-  }
-
-  async uploadToServer() {
-    if (typeof syncManager === 'undefined') {
-      return;
-    }
-
+    
+    // 通过后台执行上传，以便广播状态
     try {
-      await syncManager.uploadToServer(this.rules, this.groups);
+      await chrome.runtime.sendMessage({ 
+        action: 'uploadRules', 
+        rules: this.rules, 
+        groups: this.groups 
+      });
     } catch (error) {
-      console.error('Upload failed:', error);
+      console.error('Upload request failed:', error);
+      this.updateSyncStatus(SyncStatus.ERROR, '上传失败');
     }
   }
 
   updateSyncStatus(status, message) {
     if (!this.elements.syncStatus) return;
-
     const statusText = message || this.getStatusText(status);
     this.elements.syncStatus.textContent = statusText;
-    
     this.elements.syncStatus.className = 'sync-status';
-    
     switch (status) {
       case SyncStatus.DOWNLOADING:
       case SyncStatus.UPLOADING:
@@ -183,33 +162,21 @@ class PopupManager {
 
   updateSyncStatusVisibility() {
     if (this.elements.syncStatus) {
-      const syncEnabled = syncManager.isSyncEnabled(this.syncConfig);
+      const syncEnabled = this.syncConfig && syncManager.isSyncEnabled(this.syncConfig);
       this.elements.syncStatus.style.display = syncEnabled ? 'block' : 'none';
     }
   }
 
   getStatusText(status) {
     switch (status) {
-      case SyncStatus.DOWNLOADING:
-        return '下载中...';
-      case SyncStatus.DOWNLOADED:
-        return '已下载';
-      case SyncStatus.UPLOADING:
-        return '上传中...';
-      case SyncStatus.UPLOADED:
-        return '已上传';
-      case SyncStatus.ERROR:
-        return '错误';
+      case SyncStatus.DOWNLOADING: return '下载中...';
+      case SyncStatus.DOWNLOADED: return '已下载';
+      case SyncStatus.UPLOADING: return '上传中...';
+      case SyncStatus.UPLOADED: return '已上传';
+      case SyncStatus.ERROR: return '错误';
       case SyncStatus.IDLE:
-      default:
-        return '就绪';
+      default: return '就绪';
     }
-  }
-
-  escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
   }
 }
 
